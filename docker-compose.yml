@@ -22,6 +22,8 @@ services:
       - ./db/owner_test_data.sql:/docker-entrypoint-initdb.d/05-owner_test_data.sql:ro
       - ./db/property_enhance.sql:/docker-entrypoint-initdb.d/06-property_enhance.sql:ro
       - ./db/parking_init.sql:/docker-entrypoint-initdb.d/07-parking_init.sql:ro
+      - ./db/tenant_init.sql:/docker-entrypoint-initdb.d/08-tenant_init.sql:ro
+      - ./db/tenant_test_data.sql:/docker-entrypoint-initdb.d/09-tenant_test_data.sql:ro
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]

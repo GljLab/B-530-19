@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS park_tenant (
     id_card VARCHAR(18) COMMENT '身份证号（个人租户）',
     birth_date DATE COMMENT '出生日期（个人租户）',
     phone VARCHAR(11) NOT NULL COMMENT '手机号（主要）',
-    backup_phone VARCHAR(11) COMMENT '备用手机',
+    backup_phone VARCHAR(20) COMMENT '备用手机',
     email VARCHAR(100) COMMENT '电子邮箱',
     work_unit VARCHAR(100) COMMENT '工作单位',
     occupation VARCHAR(50) COMMENT '职业',
@@ -143,68 +143,68 @@ CREATE TABLE IF NOT EXISTS park_tenant_property (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='租户-房产关联表';
 
 -- =============================================
--- 新增租户管理菜单
+-- 新增租户管理菜单（ID: 700-731）
 -- =============================================
 INSERT INTO sys_menu (id, menu_name, parent_id, order_num, path, component, perms, menu_type, visible, status, icon) VALUES
-(400, '租户管理', 100, 9, '/park/tenant', 'tenant/TenantList', 'park:tenant:list', 1, 1, 1, 'User'),
-(401, '合约管理', 100, 10, '/park/contract', 'tenant/ContractList', 'park:contract:list', 1, 1, 1, 'Document'),
-(402, '租户统计', 100, 11, '/park/tenant/stats', 'tenant/TenantStats', 'park:tenant:stats', 1, 1, 1, 'DataLine');
+(700, '租户管理', 100, 15, '/park/tenant', 'tenant/TenantList', 'park:tenant:list', 1, 1, 1, 'User'),
+(701, '合约管理', 100, 16, '/park/contract', 'tenant/ContractList', 'park:contract:list', 1, 1, 1, 'Document'),
+(702, '租户统计', 100, 17, '/park/tenant/stats', 'tenant/TenantStats', 'park:tenant:stats', 1, 1, 1, 'DataLine');
 
 -- 租户管理按钮权限
 INSERT INTO sys_menu (id, menu_name, parent_id, order_num, path, component, perms, menu_type, visible, status, icon) VALUES
-(411, '租户查询', 400, 1, '', NULL, 'park:tenant:query', 2, 1, 1, NULL),
-(412, '租户新增', 400, 2, '', NULL, 'park:tenant:add', 2, 1, 1, NULL),
-(413, '租户修改', 400, 3, '', NULL, 'park:tenant:edit', 2, 1, 1, NULL),
-(414, '租户删除', 400, 4, '', NULL, 'park:tenant:delete', 2, 1, 1, NULL),
-(415, '加入黑名单', 400, 5, '', NULL, 'park:tenant:blacklist', 2, 1, 1, NULL),
-(416, '导入租户', 400, 6, '', NULL, 'park:tenant:import', 2, 1, 1, NULL),
-(417, '导出租户', 400, 7, '', NULL, 'park:tenant:export', 2, 1, 1, NULL);
+(711, '租户查询', 700, 1, '', NULL, 'park:tenant:query', 2, 1, 1, NULL),
+(712, '租户新增', 700, 2, '', NULL, 'park:tenant:add', 2, 1, 1, NULL),
+(713, '租户修改', 700, 3, '', NULL, 'park:tenant:edit', 2, 1, 1, NULL),
+(714, '租户删除', 700, 4, '', NULL, 'park:tenant:delete', 2, 1, 1, NULL),
+(715, '加入黑名单', 700, 5, '', NULL, 'park:tenant:blacklist', 2, 1, 1, NULL),
+(716, '导入租户', 700, 6, '', NULL, 'park:tenant:import', 2, 1, 1, NULL),
+(717, '导出租户', 700, 7, '', NULL, 'park:tenant:export', 2, 1, 1, NULL);
 
 -- 合约管理按钮权限
 INSERT INTO sys_menu (id, menu_name, parent_id, order_num, path, component, perms, menu_type, visible, status, icon) VALUES
-(421, '合约查询', 401, 1, '', NULL, 'park:contract:query', 2, 1, 1, NULL),
-(422, '合约创建', 401, 2, '', NULL, 'park:contract:add', 2, 1, 1, NULL),
-(423, '合约修改', 401, 3, '', NULL, 'park:contract:edit', 2, 1, 1, NULL),
-(424, '合约审核', 401, 4, '', NULL, 'park:contract:audit', 2, 1, 1, NULL),
-(425, '合约续签', 401, 5, '', NULL, 'park:contract:renew', 2, 1, 1, NULL),
-(426, '合约解除', 401, 6, '', NULL, 'park:contract:terminate', 2, 1, 1, NULL),
-(427, '合约打印', 401, 7, '', NULL, 'park:contract:print', 2, 1, 1, NULL);
+(721, '合约查询', 701, 1, '', NULL, 'park:contract:query', 2, 1, 1, NULL),
+(722, '合约创建', 701, 2, '', NULL, 'park:contract:add', 2, 1, 1, NULL),
+(723, '合约修改', 701, 3, '', NULL, 'park:contract:edit', 2, 1, 1, NULL),
+(724, '合约审核', 701, 4, '', NULL, 'park:contract:audit', 2, 1, 1, NULL),
+(725, '合约续签', 701, 5, '', NULL, 'park:contract:renew', 2, 1, 1, NULL),
+(726, '合约解除', 701, 6, '', NULL, 'park:contract:terminate', 2, 1, 1, NULL),
+(727, '合约打印', 701, 7, '', NULL, 'park:contract:print', 2, 1, 1, NULL);
 
 -- 租户统计按钮权限
 INSERT INTO sys_menu (id, menu_name, parent_id, order_num, path, component, perms, menu_type, visible, status, icon) VALUES
-(431, '统计查询', 402, 1, '', NULL, 'park:tenant:statsQuery', 2, 1, 1, NULL);
+(731, '统计查询', 702, 1, '', NULL, 'park:tenant:statsQuery', 2, 1, 1, NULL);
 
 -- 超级管理员拥有租户管理所有权限
 INSERT INTO sys_role_menu (role_id, menu_id) VALUES
-(1, 400), (1, 401), (1, 402),
-(1, 411), (1, 412), (1, 413), (1, 414), (1, 415), (1, 416), (1, 417),
-(1, 421), (1, 422), (1, 423), (1, 424), (1, 425), (1, 426), (1, 427),
-(1, 431);
+(1, 700), (1, 701), (1, 702),
+(1, 711), (1, 712), (1, 713), (1, 714), (1, 715), (1, 716), (1, 717),
+(1, 721), (1, 722), (1, 723), (1, 724), (1, 725), (1, 726), (1, 727),
+(1, 731);
 
 -- 物业管理员拥有租户管理所有权限
 INSERT INTO sys_role_menu (role_id, menu_id) VALUES
-(3, 400), (3, 401), (3, 402),
-(3, 411), (3, 412), (3, 413), (3, 414), (3, 415), (3, 416), (3, 417),
-(3, 421), (3, 422), (3, 423), (3, 424), (3, 425), (3, 426), (3, 427),
-(3, 431);
+(3, 700), (3, 701), (3, 702),
+(3, 711), (3, 712), (3, 713), (3, 714), (3, 715), (3, 716), (3, 717),
+(3, 721), (3, 722), (3, 723), (3, 724), (3, 725), (3, 726), (3, 727),
+(3, 731);
 
 -- 物业经理权限（查看+创建编辑租户+创建合约+审核合约，不可删除租户、不可强制解除合约）
 INSERT INTO sys_role_menu (role_id, menu_id) VALUES
-(4, 400), (4, 401), (4, 402),
-(4, 411), (4, 412), (4, 413), (4, 417),
-(4, 421), (4, 422), (4, 424), (4, 425),
-(4, 431);
+(4, 700), (4, 701), (4, 702),
+(4, 711), (4, 712), (4, 713), (4, 717),
+(4, 721), (4, 722), (4, 724), (4, 725),
+(4, 731);
 
 -- 客服人员权限（查看租户信息、创建租户、添加备注，不可创建合约、不可删除租户）
 INSERT INTO sys_role_menu (role_id, menu_id) VALUES
-(5, 400), (5, 401), (5, 402),
-(5, 411), (5, 412),
-(5, 421),
-(5, 431);
+(5, 700), (5, 701), (5, 702),
+(5, 711), (5, 712),
+(5, 721),
+(5, 731);
 
 -- 财务人员权限（查看租户和合约信息、查看租金和费用信息、导出数据，不可修改）
 INSERT INTO sys_role_menu (role_id, menu_id) VALUES
-(6, 400), (6, 401), (6, 402),
-(6, 411), (6, 417),
-(6, 421),
-(6, 431);
+(6, 700), (6, 701), (6, 702),
+(6, 711), (6, 717),
+(6, 721),
+(6, 731);

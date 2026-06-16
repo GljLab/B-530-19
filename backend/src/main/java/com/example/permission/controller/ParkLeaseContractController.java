@@ -25,7 +25,7 @@ public class ParkLeaseContractController {
     private ParkLeaseContractService parkLeaseContractService;
 
     @GetMapping("/list")
-    @PreAuthorize("hasAuthority('park:leaseContract:list')")
+    @PreAuthorize("hasAuthority('park:contract:list')")
     public Result<PageResult<ParkLeaseContract>> list(
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "20") Integer pageSize,
@@ -48,14 +48,14 @@ public class ParkLeaseContractController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('park:leaseContract:query')")
+    @PreAuthorize("hasAuthority('park:contract:query')")
     public Result<ParkLeaseContract> getInfo(@PathVariable Long id) {
         ParkLeaseContract contract = parkLeaseContractService.getById(id);
         return Result.success(contract);
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('park:leaseContract:add')")
+    @PreAuthorize("hasAuthority('park:contract:add')")
     public Result<Void> add(@RequestBody ParkLeaseContract contract) {
         Long operatorId = null;
         String operatorName = null;
@@ -73,14 +73,14 @@ public class ParkLeaseContractController {
     }
 
     @PutMapping
-    @PreAuthorize("hasAuthority('park:leaseContract:edit')")
+    @PreAuthorize("hasAuthority('park:contract:edit')")
     public Result<Void> update(@RequestBody ParkLeaseContract contract) {
         parkLeaseContractService.update(contract);
         return Result.success("修改成功", null);
     }
 
     @PostMapping("/audit")
-    @PreAuthorize("hasAuthority('park:leaseContract:audit')")
+    @PreAuthorize("hasAuthority('park:contract:audit')")
     public Result<Void> audit(@RequestBody Map<String, Object> params) {
         Long contractId = Long.valueOf(params.get("contractId").toString());
         Integer auditResult = Integer.valueOf(params.get("auditResult").toString());
@@ -103,7 +103,7 @@ public class ParkLeaseContractController {
     }
 
     @PostMapping("/renew")
-    @PreAuthorize("hasAuthority('park:leaseContract:renew')")
+    @PreAuthorize("hasAuthority('park:contract:renew')")
     public Result<ParkLeaseContract> renew(@RequestBody Map<String, Object> params) {
         Long contractId = Long.valueOf(params.get("contractId").toString());
         LocalDate newStartDate = params.get("newStartDate") != null ?
@@ -132,7 +132,7 @@ public class ParkLeaseContractController {
     }
 
     @PostMapping("/terminate")
-    @PreAuthorize("hasAuthority('park:leaseContract:terminate')")
+    @PreAuthorize("hasAuthority('park:contract:terminate')")
     public Result<Void> requestTermination(@RequestBody Map<String, Object> params) {
         Long contractId = Long.valueOf(params.get("contractId").toString());
         String terminationReason = params.get("terminationReason") != null ?
@@ -181,7 +181,7 @@ public class ParkLeaseContractController {
     }
 
     @PostMapping("/check-expired")
-    @PreAuthorize("hasAuthority('park:leaseContract:edit')")
+    @PreAuthorize("hasAuthority('park:contract:edit')")
     public Result<Void> checkAndUpdateExpiredContracts() {
         parkLeaseContractService.checkAndUpdateExpiredContracts();
         return Result.success("已更新到期合约状态", null);

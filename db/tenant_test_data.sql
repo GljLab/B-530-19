@@ -54,14 +54,14 @@ INSERT INTO park_tenant (tenant_code, tenant_type, name, gender, id_card, birth_
     contact_person, contact_position, contact_phone, enterprise_address,
     business_license_url) VALUES
 ('ZH007', 2, '北京科创信息技术有限公司', NULL, NULL, NULL,
-    '13900139007', '010-88888888', 'hr@kechuang.com', NULL, NULL, NULL,
+    '13900139007', '01088888888', 'hr@kechuang.com', NULL, NULL, NULL,
     '李总', '法定代表人', '13900139077',
     1, '企业员工宿舍租赁，长期合作',
     '北京科创信息技术有限公司', '91110108MA0ABC1234', '李建国',
     '张经理', '行政经理', '13900139007', '北京市海淀区中关村科技园',
     'https://example.com/license/kechuang.jpg'),
 ('ZH008', 2, '北京众创空间管理有限公司', NULL, NULL, NULL,
-    '13900139008', '010-66666666', 'contact@zhongchuang.com', NULL, NULL, NULL,
+    '13900139008', '01066666666', 'contact@zhongchuang.com', NULL, NULL, NULL,
     '王总', '法定代表人', '13900139088',
     1, '联合办公空间租赁，整层租用',
     '北京众创空间管理有限公司', '91110105MA0DEF5678', '王志远',
@@ -71,7 +71,7 @@ INSERT INTO park_tenant (tenant_code, tenant_type, name, gender, id_card, birth_
 -- =============================================
 -- 2. 租赁合约测试数据（5个）
 -- =============================================
--- 合约1：陈浩 租 1-102（业主出租，YZ001张伟）- 生效中
+-- 合约1：陈浩 租 1-102（业主出租，YZ001张伟）- 生效中（当前有效）
 INSERT INTO park_lease_contract (contract_code, tenant_id, tenant_code, tenant_name,
     property_id, property_code, owner_id, owner_code, owner_name,
     lease_type, start_date, end_date, lease_months,
@@ -84,14 +84,14 @@ INSERT INTO park_lease_contract (contract_code, tenant_id, tenant_code, tenant_n
     create_time, update_time) VALUES
 ('HT001', 1, 'ZH001', '陈浩',
     2, '1-102', 1, 'YZ001', '张伟',
-    1, '2024-06-01', '2025-05-31', 12,
+    1, '2026-01-01', '2026-12-31', 12,
     3500.00, 7000.00, 1,
     0, 300.00,
     1, 1, 1,
     3500.00, 0.05,
     '租赁期间，承租人应按时支付租金及各项费用。提前解约需提前30天通知，并支付1个月租金作为违约金。', 2,
-    '2024-05-25 10:30:00', 1, '管理员',
-    '2024-05-20 14:00:00', '2024-05-25 10:30:00');
+    '2025-12-25 10:30:00', 1, '管理员',
+    '2025-12-20 14:00:00', '2025-12-25 10:30:00');
 
 -- 合约2：林小雨 租 1-204（业主出租，YZ003王芳）- 生效中
 INSERT INTO park_lease_contract (contract_code, tenant_id, tenant_code, tenant_name,

@@ -77,6 +77,21 @@
             <span>车位统计</span>
           </el-menu-item>
           
+          <el-menu-item index="/park/tenant" v-if="hasPermission('park:tenant:list')">
+            <el-icon><User /></el-icon>
+            <span>租户管理</span>
+          </el-menu-item>
+          
+          <el-menu-item index="/park/contract" v-if="hasPermission('park:contract:list')">
+            <el-icon><Document /></el-icon>
+            <span>合约管理</span>
+          </el-menu-item>
+          
+          <el-menu-item index="/park/tenant/stats" v-if="hasPermission('park:tenant:stats')">
+            <el-icon><DataLine /></el-icon>
+            <span>租户统计</span>
+          </el-menu-item>
+          
           <el-menu-item index="/park/transfer" v-if="hasPermission('park:transfer:list')">
             <el-icon><Switch /></el-icon>
             <span>房产转让</span>
@@ -183,7 +198,7 @@ import {
   HomeFilled, Setting, User, Avatar, Menu, Lock,
   Expand, Fold, ArrowDown, SwitchButton,
   OfficeBuilding, Grid, DataAnalysis, House, DataLine, UserFilled,
-  Switch, CircleCheck, PriceTag, Van
+  Switch, CircleCheck, PriceTag, Van, Document
 } from '@element-plus/icons-vue'
 
 const route = useRoute()
@@ -209,6 +224,9 @@ const hasParkPermission = computed(() => {
          hasPermission('park:owner:stats') ||
          hasPermission('park:parking:list') ||
          hasPermission('park:parking:stats') ||
+         hasPermission('park:tenant:list') ||
+         hasPermission('park:contract:list') ||
+         hasPermission('park:tenant:stats') ||
          hasPermission('park:transfer:list') ||
          hasPermission('park:transfer:audit') ||
          hasPermission('park:tag:list')

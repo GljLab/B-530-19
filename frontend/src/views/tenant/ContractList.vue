@@ -368,12 +368,12 @@ const terminateRules = {
   remark: [{ required: true, message: '请输入备注说明', trigger: 'blur' }]
 }
 
-const hasListPermission = computed(() => userStore.hasPermission('park:leaseContract:list'))
-const hasAddPermission = computed(() => userStore.hasPermission('park:leaseContract:add'))
-const hasEditPermission = computed(() => userStore.hasPermission('park:leaseContract:edit'))
-const hasAuditPermission = computed(() => userStore.hasPermission('park:leaseContract:audit'))
-const hasRenewPermission = computed(() => userStore.hasPermission('park:leaseContract:renew'))
-const hasTerminatePermission = computed(() => userStore.hasPermission('park:leaseContract:terminate'))
+const hasListPermission = computed(() => userStore.hasPermission('park:contract:list'))
+const hasAddPermission = computed(() => userStore.hasPermission('park:contract:add'))
+const hasEditPermission = computed(() => userStore.hasPermission('park:contract:edit'))
+const hasAuditPermission = computed(() => userStore.hasPermission('park:contract:audit'))
+const hasRenewPermission = computed(() => userStore.hasPermission('park:contract:renew'))
+const hasTerminatePermission = computed(() => userStore.hasPermission('park:contract:terminate'))
 
 onMounted(() => {
   loadTenants()
