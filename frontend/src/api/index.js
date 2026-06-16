@@ -27,7 +27,25 @@ request.interceptors.request.use(
 // 响应拦截器
 request.interceptors.response.use(
   (response) => {
-    return response.data
+    const res = response.data
+    if (response.config.responseType === 'blob' || response.config.responseType === 'arraybuffer') {
+      return res
+    }
+    if (res.code !== 200) {
+      ElMessage.error(res.message || '请求失败')
+      if (res.code === 401) {
+        localStorage.removeItem('token')
+        ElMessageBox.confirm('登录已过期，请重新登录', '提示', {
+          confirmButtonText: '重新登录',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          window.location.href = '/login'
+        }).catch(() => {})
+      }
+      return Promise.reject(res)
+    }
+    return res
   },
   (error) => {
     let message = '请求失败'

@@ -47,12 +47,12 @@
           <el-input v-model="queryForm.keyword" placeholder="合同编号/租户名称/房产编号" clearable @keyup.enter="handleSearch" style="width: 220px;" />
         </el-form-item>
         <el-form-item label="合同状态">
-          <el-select v-model="queryForm.status" placeholder="全部" clearable style="width: 120px;">
-            <el-option label="待审核" :value="1" />
-            <el-option label="有效" :value="2" />
-            <el-option label="已续租" :value="3" />
-            <el-option label="已终止" :value="4" />
-            <el-option label="已过期" :value="5" />
+          <el-select v-model="queryForm.contractStatus" placeholder="全部" clearable style="width: 120px;">
+            <el-option label="待生效" :value="1" />
+            <el-option label="生效中" :value="2" />
+            <el-option label="已续签" :value="3" />
+            <el-option label="已解除" :value="4" />
+            <el-option label="已到期" :value="5" />
             <el-option label="已拒绝" :value="6" />
           </el-select>
         </el-form-item>
@@ -70,9 +70,9 @@
             <el-option v-for="tenant in tenantOptions" :key="tenant.id" :label="tenant.name" :value="tenant.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="签约日期">
+        <el-form-item label="起租日期">
           <el-date-picker
-            v-model="queryForm.signDateRange"
+            v-model="queryForm.startDateRange"
             type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
@@ -82,7 +82,7 @@
         </el-form-item>
         <el-form-item label="到期日期">
           <el-date-picker
-            v-model="queryForm.expireDateRange"
+            v-model="queryForm.endDateRange"
             type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
@@ -159,8 +159,8 @@
         <el-table-column prop="endDate" label="结束日期" width="120" sortable="custom" />
         <el-table-column label="合同状态" width="100">
           <template #default="{ row }">
-            <el-tag :type="getStatusTagType(row.status)" size="small">
-              {{ getStatusLabel(row.status) }}
+            <el-tag :type="getStatusTagType(row.contractStatus)" size="small">
+              {{ getStatusLabel(row.contractStatus) }}
             </el-tag>
           </template>
         </el-table-column>
@@ -168,9 +168,9 @@
           <template #default="{ row }">
             <el-button type="primary" size="small" @click="handleView(row)">详情</el-button>
             <el-button v-if="hasEditPermission" type="success" size="small" @click="handleEdit(row)">编辑</el-button>
-            <el-button v-if="hasAuditPermission && row.status === 1" type="warning" size="small" @click="handleAudit(row)">审核</el-button>
-            <el-button v-if="hasRenewPermission && row.status === 2" type="primary" size="small" @click="handleRenew(row)">续租</el-button>
-            <el-button v-if="hasTerminatePermission && (row.status === 2 || row.status === 3)" type="danger" size="small" @click="handleTerminate(row)">终止</el-button>
+            <el-button v-if="hasAuditPermission && row.contractStatus === 1" type="warning" size="small" @click="handleAudit(row)">审核</el-button>
+            <el-button v-if="hasRenewPermission && row.contractStatus === 2" type="primary" size="small" @click="handleRenew(row)">续签</el-button>
+            <el-button v-if="hasTerminatePermission && row.contractStatus === 2" type="danger" size="small" @click="handleTerminate(row)">解除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -201,8 +201,8 @@
           <span style="color: #F56C6C; font-weight: 500;">{{ formatMoney(currentContract?.monthlyRent) }} 元</span>
         </el-form-item>
         <el-form-item label="当前状态">
-          <el-tag :type="getStatusTagType(currentContract?.status)">
-            {{ getStatusLabel(currentContract?.status) }}
+          <el-tag :type="getStatusTagType(currentContract?.contractStatus)">
+            {{ getStatusLabel(currentContract?.contractStatus) }}
           </el-tag>
         </el-form-item>
         <el-form-item label="审核结果">
@@ -324,11 +324,11 @@ const queryForm = reactive({
   pageNum: 1,
   pageSize: 20,
   keyword: '',
-  status: null,
+  contractStatus: null,
   leaseType: null,
   tenantId: null,
-  signDateRange: [],
-  expireDateRange: [],
+  startDateRange: [],
+  endDateRange: [],
   sortField: null,
   sortOrder: 'asc'
 })
@@ -388,8 +388,16 @@ function loadTenants() {
 }
 
 function loadStats() {
-  api.parkTenant.stats().then(res => {
-    stats.value = res.data || {}
+  api.parkLeaseContract.list({ pageSize: 10000 }).then(res => {
+    const list = res.data?.list || []
+    stats.value = {
+      totalCount: list.length,
+      pendingAuditCount: list.filter(i => i.contractStatus === 1).length,
+      activeCount: list.filter(i => i.contractStatus === 2).length,
+      renewedCount: list.filter(i => i.contractStatus === 3).length,
+      terminatedCount: list.filter(i => i.contractStatus === 4).length,
+      expiredCount: list.filter(i => i.contractStatus === 5).length
+    }
   })
 }
 
@@ -399,21 +407,21 @@ function loadList() {
     pageNum: queryForm.pageNum,
     pageSize: queryForm.pageSize,
     keyword: queryForm.keyword || undefined,
-    status: queryForm.status || undefined,
+    contractStatus: queryForm.contractStatus || undefined,
     leaseType: queryForm.leaseType || undefined,
     tenantId: queryForm.tenantId || undefined,
     sortField: queryForm.sortField || undefined,
     sortOrder: queryForm.sortOrder || undefined
   }
 
-  if (queryForm.signDateRange && queryForm.signDateRange.length === 2) {
-    params.signStartDate = queryForm.signDateRange[0]
-    params.signEndDate = queryForm.signDateRange[1]
+  if (queryForm.startDateRange && queryForm.startDateRange.length === 2) {
+    params.startDateStart = queryForm.startDateRange[0]
+    params.startDateEnd = queryForm.startDateRange[1]
   }
 
-  if (queryForm.expireDateRange && queryForm.expireDateRange.length === 2) {
-    params.expireStartDate = queryForm.expireDateRange[0]
-    params.expireEndDate = queryForm.expireDateRange[1]
+  if (queryForm.endDateRange && queryForm.endDateRange.length === 2) {
+    params.endDateStart = queryForm.endDateRange[0]
+    params.endDateEnd = queryForm.endDateRange[1]
   }
 
   api.parkLeaseContract.list(params).then(res => {
@@ -426,11 +434,11 @@ function loadList() {
 
 function getStatusLabel(status) {
   const map = {
-    1: '待审核',
-    2: '有效',
-    3: '已续租',
-    4: '已终止',
-    5: '已过期',
+    1: '待生效',
+    2: '生效中',
+    3: '已续签',
+    4: '已解除',
+    5: '已到期',
     6: '已拒绝'
   }
   return map[status] || '-'
@@ -488,11 +496,11 @@ function handleSearch() {
 
 function handleReset() {
   queryForm.keyword = ''
-  queryForm.status = null
+  queryForm.contractStatus = null
   queryForm.leaseType = null
   queryForm.tenantId = null
-  queryForm.signDateRange = []
-  queryForm.expireDateRange = []
+  queryForm.startDateRange = []
+  queryForm.endDateRange = []
   queryForm.sortField = null
   queryForm.sortOrder = 'asc'
   handleSearch()
@@ -548,20 +556,32 @@ function handleBatchAudit() {
     ElMessage.warning('请先选择要审核的合同')
     return
   }
-  ElMessageBox.confirm(`确定要批量审核选中的 ${selectedIds.value.length} 份合同吗？`, '提示', {
+  ElMessageBox.confirm(`确定要批量审核通过选中的 ${selectedIds.value.length} 份合同吗？`, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
-  }).then(() => {
-    api.parkLeaseContract.audit({
-      ids: selectedIds.value,
-      auditResult: 2,
-      auditRemark: '批量审核通过'
-    }).then(() => {
+  }).then(async () => {
+    let successCount = 0
+    let failCount = 0
+    for (const id of selectedIds.value) {
+      try {
+        await api.parkLeaseContract.audit({
+          contractId: id,
+          auditResult: 2,
+          auditOpinion: '批量审核通过'
+        })
+        successCount++
+      } catch (e) {
+        failCount++
+      }
+    }
+    if (failCount === 0) {
       ElMessage.success('批量审核成功')
-      loadList()
-      loadStats()
-    })
+    } else {
+      ElMessage.warning(`批量审核完成：成功 ${successCount} 份，失败 ${failCount} 份`)
+    }
+    loadList()
+    loadStats()
   }).catch(() => {})
 }
 
@@ -570,11 +590,15 @@ function confirmAudit() {
     ElMessage.warning('拒绝时请填写审核意见')
     return
   }
-  api.parkLeaseContract.audit({
-    id: currentContract.value.id,
+  const params = {
+    contractId: currentContract.value.id,
     auditResult: auditForm.auditResult,
-    auditRemark: auditForm.auditRemark
-  }).then(() => {
+    auditOpinion: auditForm.auditRemark
+  }
+  if (auditForm.auditResult === 6) {
+    params.rejectReason = auditForm.auditRemark
+  }
+  api.parkLeaseContract.audit(params).then(() => {
     ElMessage.success('审核完成')
     auditDialogVisible.value = false
     loadList()
@@ -596,13 +620,13 @@ async function confirmRenew() {
   try {
     await renewFormRef.value.validate()
     api.parkLeaseContract.renew({
-      id: currentContract.value.id,
+      contractId: currentContract.value.id,
       newStartDate: renewForm.newStartDate,
       newEndDate: renewForm.newEndDate,
       newMonthlyRent: renewForm.newMonthlyRent,
-      remark: renewForm.remark
+      newDepositAmount: currentContract.value.depositAmount
     }).then(() => {
-      ElMessage.success('续租成功')
+      ElMessage.success('续签成功')
       renewDialogVisible.value = false
       loadList()
       loadStats()
@@ -624,19 +648,21 @@ async function confirmTerminate() {
   if (!terminateFormRef.value) return
   try {
     await terminateFormRef.value.validate()
-    ElMessageBox.confirm(`确定要终止合同 "${currentContract.value?.contractCode}" 吗？终止后不可恢复！`, '警告', {
-      confirmButtonText: '确认终止',
+    ElMessageBox.confirm(`确定要解除合同 "${currentContract.value?.contractCode}" 吗？解除后不可恢复！`, '警告', {
+      confirmButtonText: '确认解除',
       cancelButtonText: '取消',
       type: 'danger',
       confirmButtonClass: 'el-button--danger'
     }).then(() => {
+      const reasonMap = { '1': '提前退租', '2': '协商解除', '3': '违约终止', '4': '其他原因' }
+      const reasonText = reasonMap[terminateForm.terminateReason] || terminateForm.terminateReason
       api.parkLeaseContract.terminate({
-        id: currentContract.value.id,
-        terminateDate: terminateForm.terminateDate,
-        terminateReason: terminateForm.terminateReason,
-        remark: terminateForm.remark
+        contractId: currentContract.value.id,
+        terminationReason: reasonText,
+        terminationDate: terminateForm.terminateDate,
+        terminationPenalty: 0
       }).then(() => {
-        ElMessage.success('合同已终止')
+        ElMessage.success('合同解除申请已提交，请等待审核')
         terminateDialogVisible.value = false
         loadList()
         loadStats()
@@ -669,19 +695,19 @@ function handleCheckExpired() {
 function handleExport() {
   const params = {
     keyword: queryForm.keyword || undefined,
-    status: queryForm.status || undefined,
+    contractStatus: queryForm.contractStatus || undefined,
     leaseType: queryForm.leaseType || undefined,
     tenantId: queryForm.tenantId || undefined
   }
 
-  if (queryForm.signDateRange && queryForm.signDateRange.length === 2) {
-    params.signStartDate = queryForm.signDateRange[0]
-    params.signEndDate = queryForm.signDateRange[1]
+  if (queryForm.startDateRange && queryForm.startDateRange.length === 2) {
+    params.startDateStart = queryForm.startDateRange[0]
+    params.startDateEnd = queryForm.startDateRange[1]
   }
 
-  if (queryForm.expireDateRange && queryForm.expireDateRange.length === 2) {
-    params.expireStartDate = queryForm.expireDateRange[0]
-    params.expireEndDate = queryForm.expireDateRange[1]
+  if (queryForm.endDateRange && queryForm.endDateRange.length === 2) {
+    params.endDateStart = queryForm.endDateRange[0]
+    params.endDateEnd = queryForm.endDateRange[1]
   }
 
   api.parkLeaseContract.list({ ...params, pageSize: 10000 }).then(res => {
@@ -693,8 +719,8 @@ function handleExport() {
 function exportToCSV(data) {
   const headers = ['合同编号', '租户名称', '房产编号', '租赁类型', '开始日期', '结束日期', '月租金(元)', '合同状态', '备注']
 
-  const statusMap = { 1: '待审核', 2: '有效', 3: '已续租', 4: '已终止', 5: '已过期', 6: '已拒绝' }
-  const leaseTypeMap = { 1: '整租', 2: '合租', 3: '商铺', 4: '办公', 5: '仓库' }
+  const statusMap = { 1: '待生效', 2: '生效中', 3: '已续签', 4: '已解除', 5: '已到期', 6: '已拒绝' }
+  const leaseTypeMap = { 1: '整租', 2: '合租' }
 
   const rows = data.map(item => [
     item.contractCode || '',
@@ -704,7 +730,7 @@ function exportToCSV(data) {
     item.startDate || '',
     item.endDate || '',
     item.monthlyRent || '',
-    statusMap[item.status] || '',
+    statusMap[item.contractStatus] || '',
     item.remark || ''
   ])
 

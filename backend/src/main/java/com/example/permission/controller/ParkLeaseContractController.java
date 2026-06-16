@@ -159,7 +159,7 @@ public class ParkLeaseContractController {
     }
 
     @PostMapping("/audit-termination")
-    @PreAuthorize("hasAuthority('park:leaseContract:audit')")
+    @PreAuthorize("hasAuthority('park:contract:audit')")
     public Result<Void> auditTermination(@RequestBody Map<String, Object> params) {
         Long contractId = Long.valueOf(params.get("contractId").toString());
         Integer auditResult = Integer.valueOf(params.get("auditResult").toString());

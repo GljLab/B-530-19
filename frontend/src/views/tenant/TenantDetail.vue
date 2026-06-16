@@ -353,15 +353,14 @@ const terminateForm = reactive({
   terminateDate: null,
   reasonType: null,
   remark: '',
-  depositHandle: 1,
-  refundAmount: 0
+  terminationPenalty: 0
 })
 
 const hasEditPermission = computed(() => userStore.hasPermission('park:tenant:edit'))
 const hasDeletePermission = computed(() => userStore.hasPermission('park:tenant:delete'))
-const hasViewContractPermission = computed(() => userStore.hasPermission('park:lease-contract:query'))
-const hasRenewContractPermission = computed(() => userStore.hasPermission('park:lease-contract:renew'))
-const hasTerminateContractPermission = computed(() => userStore.hasPermission('park:lease-contract:terminate'))
+const hasViewContractPermission = computed(() => userStore.hasPermission('park:contract:query'))
+const hasRenewContractPermission = computed(() => userStore.hasPermission('park:contract:renew'))
+const hasTerminateContractPermission = computed(() => userStore.hasPermission('park:contract:terminate'))
 
 onMounted(() => {
   loadDetail()
@@ -477,7 +476,7 @@ function handleRenewContract() {
   renewForm.startDate = null
   renewForm.endDate = null
   renewForm.monthlyRent = currentContract.value?.monthlyRent || null
-  renewForm.deposit = currentContract.value?.deposit || null
+  renewForm.deposit = currentContract.value?.depositAmount || null
   renewForm.paymentMethod = currentContract.value?.paymentMethod || null
   renewForm.remark = ''
   renewDialogVisible.value = true
@@ -506,15 +505,11 @@ function confirmRenew() {
   }
 
   const params = {
-    originalContractId: currentContract.value.id,
-    tenantId: tenant.value.id,
-    propertyId: tenant.value.currentPropertyId,
-    startDate: renewForm.startDate,
-    endDate: renewForm.endDate,
-    monthlyRent: renewForm.monthlyRent,
-    deposit: renewForm.deposit,
-    paymentMethod: renewForm.paymentMethod,
-    remark: renewForm.remark
+    contractId: currentContract.value.id,
+    newStartDate: renewForm.startDate,
+    newEndDate: renewForm.endDate,
+    newMonthlyRent: renewForm.monthlyRent,
+    newDepositAmount: renewForm.deposit
   }
 
   api.parkLeaseContract.renew(params).then(() => {
@@ -528,45 +523,38 @@ function handleTerminateContract() {
   terminateForm.terminateDate = null
   terminateForm.reasonType = null
   terminateForm.remark = ''
-  terminateForm.depositHandle = 1
-  terminateForm.refundAmount = 0
+  terminateForm.terminationPenalty = 0
   terminateDialogVisible.value = true
 }
 
 function confirmTerminate() {
   if (!terminateForm.terminateDate) {
-    ElMessage.warning('请选择终止日期')
+    ElMessage.warning('请选择解除日期')
     return
   }
   if (!terminateForm.reasonType) {
-    ElMessage.warning('请选择终止原因')
+    ElMessage.warning('请选择解除原因')
     return
   }
   if (!terminateForm.remark.trim()) {
     ElMessage.warning('请输入详细说明')
     return
   }
-  if (terminateForm.depositHandle === 2 && !terminateForm.refundAmount) {
-    ElMessage.warning('请填写退还金额')
-    return
-  }
 
-  ElMessageBox.confirm('确定要终止此合同吗？终止后将无法恢复。', '确认终止', {
-    confirmButtonText: '确定终止',
+  ElMessageBox.confirm('确定要申请解除此合同吗？解除申请提交后需审核通过才生效。', '确认解除', {
+    confirmButtonText: '提交申请',
     cancelButtonText: '取消',
     type: 'warning'
   }).then(() => {
     const params = {
       contractId: currentContract.value.id,
-      terminateDate: terminateForm.terminateDate,
-      reasonType: terminateForm.reasonType,
-      remark: terminateForm.remark,
-      depositHandle: terminateForm.depositHandle,
-      refundAmount: terminateForm.depositHandle === 2 ? terminateForm.refundAmount : null
+      terminationDate: terminateForm.terminateDate,
+      terminationReason: terminateForm.remark,
+      terminationPenalty: terminateForm.terminationPenalty || 0
     }
 
     api.parkLeaseContract.terminate(params).then(() => {
-      ElMessage.success('合同已终止')
+      ElMessage.success('解除申请已提交')
       terminateDialogVisible.value = false
       loadDetail()
     })

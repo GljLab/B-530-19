@@ -166,8 +166,6 @@ public class ParkLeaseContractService {
 
     @Transactional(rollbackFor = Exception.class)
     public void add(ParkLeaseContract contract, Long operatorId, String operatorName) {
-        validateContract(contract);
-
         ParkProperty property = parkPropertyMapper.selectOneById(contract.getPropertyId());
         if (property == null) {
             throw new BusinessException("房产不存在");
@@ -176,6 +174,11 @@ public class ParkLeaseContractService {
         if (property.getStatus() != 4 && property.getStatus() != 5) {
             throw new BusinessException("房产状态必须为\"业主出租\"或\"空置\"才能创建租赁合约");
         }
+
+        if (property.getOwnerId() == null) {
+            throw new BusinessException("该房产未关联业主，无法创建合约");
+        }
+        contract.setOwnerId(property.getOwnerId());
 
         ParkTenant tenant = parkTenantMapper.selectOneById(contract.getTenantId());
         if (tenant == null) {
@@ -186,6 +189,8 @@ public class ParkLeaseContractService {
         if (owner == null) {
             throw new BusinessException("业主不存在");
         }
+
+        validateContract(contract);
 
         contract.setContractCode(generateContractCode());
         contract.setTenantCode(tenant.getTenantCode());

@@ -82,8 +82,8 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="押金（元）" prop="deposit">
-              <el-input-number v-model="formData.deposit" :min="0" :precision="2" style="width: 100%;" />
+            <el-form-item label="押金（元）" prop="depositAmount">
+              <el-input-number v-model="formData.depositAmount" :min="0" :precision="2" style="width: 100%;" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -137,11 +137,10 @@ const formData = reactive({
   tenantId: null,
   propertyId: null,
   leaseType: 1,
-  signDate: '',
   startDate: '',
   endDate: '',
   monthlyRent: 0,
-  deposit: 0,
+  depositAmount: 0,
   paymentMethod: 1,
   remark: ''
 })
