@@ -270,6 +270,37 @@ const api = {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
     }
+  },
+
+  parkTenant: {
+    list: (params) => request.get('/park/tenant/list', { params }),
+    getById: (id) => request.get(`/park/tenant/${id}`),
+    add: (data) => request.post('/park/tenant', data),
+    update: (data) => request.put('/park/tenant', data),
+    delete: (id) => request.delete(`/park/tenant/${id}`),
+    setBlacklist: (data) => request.post('/park/tenant/blacklist', data),
+    stats: () => request.get('/park/tenant/stats'),
+    getTemplate: () => request.get('/park/tenant/template', { responseType: 'blob' }),
+    importData: (file) => {
+      const formData = new FormData()
+      formData.append('file', file)
+      return request.post('/park/tenant/import', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+    },
+    export: (params) => request.get('/park/tenant/export', { params })
+  },
+
+  parkLeaseContract: {
+    list: (params) => request.get('/park/lease-contract/list', { params }),
+    getById: (id) => request.get(`/park/lease-contract/${id}`),
+    add: (data) => request.post('/park/lease-contract', data),
+    update: (data) => request.put('/park/lease-contract', data),
+    audit: (data) => request.post('/park/lease-contract/audit', data),
+    renew: (data) => request.post('/park/lease-contract/renew', data),
+    terminate: (data) => request.post('/park/lease-contract/terminate', data),
+    auditTermination: (data) => request.post('/park/lease-contract/audit-termination', data),
+    checkExpired: () => request.post('/park/lease-contract/check-expired')
   }
 }
 

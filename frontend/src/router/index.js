@@ -167,6 +167,60 @@ const routes = [
         meta: { title: '车位统计', icon: 'DataLine', permission: 'park:parking:stats' }
       },
       {
+        path: 'park/tenant',
+        name: 'ParkTenant',
+        component: () => import('@/views/tenant/TenantList.vue'),
+        meta: { title: '租户管理', icon: 'User', permission: 'park:tenant:list' }
+      },
+      {
+        path: 'park/tenant/add',
+        name: 'ParkTenantAdd',
+        component: () => import('@/views/tenant/TenantForm.vue'),
+        meta: { title: '新增租户', icon: 'User', permission: 'park:tenant:add', hidden: true }
+      },
+      {
+        path: 'park/tenant/edit/:id',
+        name: 'ParkTenantEdit',
+        component: () => import('@/views/tenant/TenantForm.vue'),
+        meta: { title: '编辑租户', icon: 'User', permission: 'park:tenant:edit', hidden: true }
+      },
+      {
+        path: 'park/tenant/detail/:id',
+        name: 'ParkTenantDetail',
+        component: () => import('@/views/tenant/TenantDetail.vue'),
+        meta: { title: '租户详情', icon: 'User', permission: 'park:tenant:query', hidden: true }
+      },
+      {
+        path: 'park/tenant/stats',
+        name: 'ParkTenantStats',
+        component: () => import('@/views/tenant/TenantStats.vue'),
+        meta: { title: '租户统计', icon: 'DataLine', permission: 'park:tenant:stats' }
+      },
+      {
+        path: 'park/contract',
+        name: 'ParkLeaseContract',
+        component: () => import('@/views/tenant/ContractList.vue'),
+        meta: { title: '合约管理', icon: 'Document', permission: 'park:leaseContract:list' }
+      },
+      {
+        path: 'park/contract/add',
+        name: 'ParkLeaseContractAdd',
+        component: () => import('@/views/tenant/ContractForm.vue'),
+        meta: { title: '新增合约', icon: 'Document', permission: 'park:leaseContract:add', hidden: true }
+      },
+      {
+        path: 'park/contract/edit/:id',
+        name: 'ParkLeaseContractEdit',
+        component: () => import('@/views/tenant/ContractForm.vue'),
+        meta: { title: '编辑合约', icon: 'Document', permission: 'park:leaseContract:edit', hidden: true }
+      },
+      {
+        path: 'park/contract/detail/:id',
+        name: 'ParkLeaseContractDetail',
+        component: () => import('@/views/tenant/ContractDetail.vue'),
+        meta: { title: '合约详情', icon: 'Document', permission: 'park:leaseContract:query', hidden: true }
+      },
+      {
         path: 'system/user',
         name: 'SystemUser',
         component: () => import('@/views/system/User.vue'),
