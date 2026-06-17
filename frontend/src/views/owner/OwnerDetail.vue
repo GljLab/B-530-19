@@ -466,7 +466,7 @@ function handleBindProperty() {
   moveInDate.value = null
   isSelfOccupy.value = 1
   purchasePrice.value = null
-  api.property.list({ pageNum: 1, pageSize: 500 }).then(res => {
+  api.parkProperty.list({ pageNum: 1, pageSize: 500 }).then(res => {
     unboundPropertyList.value = res.data.list || []
     bindDialogVisible.value = true
   })

@@ -911,16 +911,28 @@ public class ParkOwnerService {
     }
 
     private Long countByPropertyCount(Integer min, Integer max) {
-        String sql = "SELECT COUNT(*) FROM (" +
-                "SELECT o.id FROM park_owner o " +
-                "LEFT JOIN park_owner_property op ON o.id = op.owner_id AND op.relation_status = 1 " +
-                "WHERE o.deleted = 0 " +
-                "GROUP BY o.id " +
-                "HAVING COUNT(op.id) >= " + min +
-                (max != null ? " AND COUNT(op.id) <= " + max : "") +
-                ") t";
-        Object result = parkOwnerMapper.selectObjectByQuery(QueryWrapper.create().select(sql));
-        return result != null ? Long.parseLong(result.toString()) : 0L;
+        // 获取所有业主
+        List<ParkOwner> owners = parkOwnerMapper.selectListByQuery(
+            QueryWrapper.create().from(ParkOwner.class).where(PARK_OWNER.DELETED.eq(0))
+        );
+        
+        // 逐个统计每个业主持有的房产数量
+        long count = 0;
+        for (ParkOwner owner : owners) {
+            Long propertyCount = parkOwnerPropertyMapper.selectCountByQuery(
+                QueryWrapper.create()
+                    .from(ParkOwnerProperty.class)
+                    .where(PARK_OWNER_PROPERTY.OWNER_ID.eq(owner.getId()))
+                    .and(PARK_OWNER_PROPERTY.RELATION_STATUS.eq(1))
+            );
+            
+            if (propertyCount != null) {
+                if (propertyCount >= min && (max == null || propertyCount <= max)) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 
     private long getTotalPropertyCount() {
